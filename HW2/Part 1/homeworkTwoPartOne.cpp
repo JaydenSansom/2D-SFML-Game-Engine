@@ -6,6 +6,7 @@
 #include "Collider.hpp"
 #include "Platforms.hpp"
 #include "Player.hpp"
+#include "Thread.hpp"
 
 // Global window size
 int WINDOW_WIDTH = 800;
