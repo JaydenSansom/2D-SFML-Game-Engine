@@ -15,7 +15,7 @@ int WINDOW_HEIGHT = 600;
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 2 Part 1
+ * HW 2 Part 2
  * 
  * @return int exit code
  */
@@ -27,7 +27,7 @@ int main() {
     std::condition_variable cv;
 
     // Create window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 2 Part 1");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 2 Part 2");
     // Get running desktop and set window to be positioned in the middle of the screen
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.setPosition(sf::Vector2i(desktop.width / 2 - window.getSize().x / 2, 
