@@ -37,39 +37,17 @@ bool Thread::isBusy() {
  * @brief Run the thread
  */
 void Thread::run() {
-    if(i == 0) {
-        try {
-            threadFunction();
+    try {
+        threadFunction();
 
-            { // anonymous inner block to manage scope of mutex lock 
-                std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                _condition_variable->notify_all();
-            }
-            { // anonymous inner block to manage scope of mutex lock 
-                std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                _condition_variable->notify_all();
-            }
-            { // anonymous inner block to manage scope of mutex lock 
-                std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                busy = !busy;
-                _condition_variable->notify_all();
-            }
-        }
-        catch (...) {
-            std::cerr << "Thread " << i << " caught exception." << std::endl;
+        { // anonymous inner block to manage scope of mutex lock 
+            std::unique_lock<std::mutex> cv_lock(*this->_mutex);
+            busy = !busy;
+            _condition_variable->notify_all();
         }
     }
-    else { // id == 1
-        while(other->isBusy()) {
-            try {
-                std::unique_lock<std::mutex> lock(*_mutex);
-                _condition_variable->wait(lock);
-            }
-            catch (...) {
-                std::cerr << "Thread " << i << " caught exception." << std::endl;
-            }
-        }
-        threadFunction();
+    catch (...) {
+        std::cerr << "Thread " << i << " caught exception." << std::endl;
     }
 }
 
