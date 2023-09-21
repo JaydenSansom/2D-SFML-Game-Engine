@@ -38,13 +38,13 @@ bool Thread::isBusy() {
  */
 void Thread::run() {
     try {
-        threadFunction();
-
         { // anonymous inner block to manage scope of mutex lock 
             std::unique_lock<std::mutex> cv_lock(*this->_mutex);
             busy = !busy;
             _condition_variable->notify_all();
         }
+
+        threadFunction();
     }
     catch (...) {
         std::cerr << "Thread " << i << " caught exception." << std::endl;

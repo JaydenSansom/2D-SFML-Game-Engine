@@ -53,7 +53,7 @@ int main() {
     Thread playerThread = Thread(0, nullptr, &m, &cv, [&]() {
         player.update(elapsed.asSeconds());
     });
-    Thread platformThread = Thread(0, &playerThread, &m, &cv, [&]() {
+    Thread platformThread = Thread(1, &playerThread, &m, &cv, [&]() {
         movingPlatform.update(elapsed.asSeconds());
     });
 
