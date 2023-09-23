@@ -8,10 +8,13 @@
 #include "Platforms.hpp"
 #include "Player.hpp"
 #include "Thread.hpp"
+#include "Timeline.hpp"
 
 // Global window size
 int WINDOW_WIDTH = 800;
 int WINDOW_HEIGHT = 600;
+
+Timeline gameTime = Timeline(1);
 
 /**
  * @brief Jayden Sansom, jksanso2
@@ -35,9 +38,6 @@ int main() {
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(60);
 
-    // Start clock
-    sf::Clock clock;
-
     // Create floor
     Platform floor = Platform(0.f, 550.f, 800.f, 50.f);
     floor.setCollisionEnabled(true);
@@ -48,14 +48,18 @@ int main() {
     Player player = Player(WINDOW_WIDTH, WINDOW_HEIGHT, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
     player.setCollisionEnabled(true);
 
-    sf::Time elapsed = clock.restart();
+    // Set up time variables
+    float previousTime = gameTime.getTime();
+    float currentTime, elapsed;
 
     Thread playerThread = Thread(0, nullptr, &m, &cv, [&]() {
-        player.update(elapsed.asSeconds());
+        player.update(elapsed);
     });
     Thread platformThread = Thread(1, &playerThread, &m, &cv, [&]() {
-        movingPlatform.update(elapsed.asSeconds());
+        movingPlatform.update(elapsed);
     });
+
+    bool pauseKeyPressedOnce = false, lowerTicKeyPressedOnce = false, raiseTicKeyPressedOnce = false;
 
     // While open loop
     while(window.isOpen()) {
@@ -64,8 +68,52 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::P) && !pauseKeyPressedOnce) { // If the player presses 'P' pause or unpause the window
+            if(gameTime.isPaused()) {
+                gameTime.unpause();
+            }
+            else {
+                gameTime.pause();
+            }
+            pauseKeyPressedOnce = true;
+        }
+        else if(!sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+            pauseKeyPressedOnce = false; // Allow pausing once key is released
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::I) && !lowerTicKeyPressedOnce) { // If the player presses 'I' decrease tic speed
+            float currentTic = gameTime.getTic();
+            if(currentTic == 1.f) {
+                gameTime.changeTic(0.5f);
+            }
+            else if(currentTic == 2.f) {
+                gameTime.changeTic(1.f);
+            }
+            lowerTicKeyPressedOnce = true;
+        }
+        else if(!sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
+            lowerTicKeyPressedOnce = false; // Allow decreasing of tic again once key is released
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::O) && !raiseTicKeyPressedOnce) { // If the player presses 'O' increase tic speed
+            float currentTic = gameTime.getTic();
+            if(currentTic == 1.f) {
+                gameTime.changeTic(2.f);
+            }
+            else if(currentTic == 0.5f) {
+                gameTime.changeTic(1.f);
+            }
+            raiseTicKeyPressedOnce = true;
+        }
+        else if(!sf::Keyboard::isKeyPressed(sf::Keyboard::O)) {
+            raiseTicKeyPressedOnce = false; // Allow increasing of tic again once key is released
+        }
 
-        elapsed = clock.restart();
+        if(gameTime.isPaused()) {
+            elapsed = 0.f; // It just works "¯\_(ツ)_/¯ "
+        }
+        else {
+            currentTime = gameTime.getTime();
+            elapsed = (currentTime - previousTime) / (gameTime.getTic() * 1000.f);
+        }
 
         std::thread runPlayerUpdate(run_wrapper, &playerThread);
         std::thread runPlatformUpdate(run_wrapper, &platformThread);
@@ -81,6 +129,8 @@ int main() {
         window.draw(player);
 
         window.display();
+
+        previousTime = currentTime;
     }
 
     return 0; // Return on end
