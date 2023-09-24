@@ -112,7 +112,7 @@ int main() {
         }
         else {
             currentTime = gameTime.getTime();
-            elapsed = (currentTime - previousTime) / (gameTime.getTic() * 1000.f);
+            elapsed = (currentTime - previousTime) / 1000.f;
         }
 
         std::thread runPlayerUpdate(run_wrapper, &playerThread);
