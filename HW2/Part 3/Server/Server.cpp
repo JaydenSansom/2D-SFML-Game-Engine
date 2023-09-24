@@ -2,37 +2,75 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <vector>
 
 #include <zmq.hpp>
 
+/**
+ * @brief Client info represented as a struct including the client's name and iteration number.
+ */
+typedef struct {
+    std::string name;
+    int iteration;
+} Client;
+
 int main() 
 {
-    using namespace std::chrono_literals;
-
     // initialize the zmq context with a single IO thread
     zmq::context_t context{1};
 
     // construct a REP (reply) socket and bind to interface
-    zmq::socket_t socket{context, zmq::socket_type::rep};
-    socket.bind("tcp://*:5555");
+    zmq::socket_t replier{context, zmq::socket_type::rep};
+    replier.bind("tcp://*:5555");
 
-    // prepare some static data for responses
-    const std::string data{"World"};
+    // construct a PUB (publisher) socket and bind to interface
+    zmq::socket_t publisher{context, zmq::socket_type::rep};
+    publisher.bind("tcp://*:5555");
 
-    for (;;) 
-    {
-        zmq::message_t request;
+    std::vector<Client> clients;
 
-        // receive a request from client
-        socket.recv(request, zmq::recv_flags::none);
-        std::cout << "Received " << request.to_string() << std::endl;
+    std::thread publisherThread(publish, &publisher, &clients);
 
-        // simulate work
-        std::this_thread::sleep_for(1s);
+    while (true) {
+        // Wait for a client
+        zmq::message_t message;
+        replier.recv(message, zmq::recv_flags::none);
+        std::string clientId = std::string(static_cast<char*>(message.data()), message.size());
 
-        // send the reply to the client
-        socket.send(zmq::buffer(data), zmq::send_flags::none);
+        // Create new Client
+        Client newClient = {clientId, 1};
+        clients.push_back(newClient);
+        std::cout << "Received " << clientId << std::endl;
+
+        // Send the reply to the client
+        replier.send(zmq::buffer("Client " + clientId + " connected."), zmq::send_flags::none);
     }
 
     return 0;
+}
+
+/**
+ * @brief Function for running the publisher socket where data will be processed
+ * 
+ * @param publisherSocket socket of the publisher
+ * @param clients list of current client objects
+ */
+void publish(zmq::socket_t* publisherSocket, std::vector<Client>* clients) {
+    using namespace std::chrono_literals;
+
+    while(true) {
+        std::string message = "";
+        for(int i = 0; i < clients->size(); i++) {
+            message += "Client " + std::to_string(i + 1) + ": Iteration " + std::to_string((*clients)[i].iteration) + "\n";
+            (*clients)[i].iteration += 1;
+        }
+
+        // Send the reply to the client
+        (*publisherSocket).send(zmq::buffer(message), zmq::send_flags::none);
+
+        // Sleepy time             zᶻ
+        //                  ૮˶- ﻌ -˶ა⌒)ᦱ
+        std::this_thread::sleep_for(10s);
+    }
+
 }
