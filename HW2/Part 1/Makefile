@@ -48,3 +48,9 @@ clean:
 .PHONY: init
 init:
 	sudo apt -y install build-essential libsfml-dev libx11-dev
+
+.PHONY: run
+run:
+	chmod +x main
+	./main
+	
