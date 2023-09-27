@@ -113,6 +113,15 @@ void Player::move(sf::Vector2f offset) {
 }
 
 /**
+ * @brief Override of the getPosition function.
+ * 
+ * @return sf::Vector2f position of the object
+ */
+sf::Vector2f Player::getPosition() {
+    return sf::Sprite::getPosition();
+}
+
+/**
  * @brief Get the Movement of an object
  * 
  * @return sf::Vector2f total movement of the object in that frame

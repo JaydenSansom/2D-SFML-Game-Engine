@@ -3,7 +3,7 @@ src := $(call rwildcard,./,*.cpp)
 
 obj = $(patsubst %.cpp,%.o,$(src))
 
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -pthread
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -pthread -lzmq
 
 INTELMAC_INCLUDEDIR=/usr/local/include			# Intel mac
 APPLESILICON_INCLUDEDIR=/opt/homebrew/include	# Apple Silicon
@@ -47,10 +47,9 @@ clean:
 
 .PHONY: init
 init:
-	sudo apt -y install build-essential libsfml-dev
+	sudo apt -y install build-essential libsfml-dev libzmq3-dev
 
 .PHONY: run
 run:
 	chmod +x main
 	./main
-	

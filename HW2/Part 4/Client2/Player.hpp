@@ -77,6 +77,13 @@ class Player : public sf::Sprite, public Collider {
          */
         void move(sf::Vector2f offset) override;
 
+         /**
+         * @brief Override of the getPosition function.
+         * 
+         * @return sf::Vector2f position of the object
+         */
+        sf::Vector2f getPosition() override;
+
         /**
          * @brief Get the Movement of an object
          * 

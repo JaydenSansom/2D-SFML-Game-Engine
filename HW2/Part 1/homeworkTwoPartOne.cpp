@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <cmath>
-#include <X11/Xlib.h>
 
 #include "Collider.hpp"
 #include "Platforms.hpp"
@@ -22,9 +21,11 @@ int WINDOW_HEIGHT = 600;
 int main() {
 
     // Mutex to handle locking, condition variable to handle notifications between threads
-    XInitThreads();
     std::mutex m;
     std::condition_variable cv;
+
+    // Keys pressed to be passed to the thread update
+    KeysPressed keysPressed;
 
     // Create window
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 2 Part 1");
@@ -51,7 +52,7 @@ int main() {
     sf::Time elapsed = clock.restart();
 
     Thread playerThread = Thread(0, nullptr, &m, &cv, [&]() {
-        player.update(elapsed.asSeconds());
+        player.update(elapsed.asSeconds(), keysPressed);
     });
     Thread platformThread = Thread(1, &playerThread, &m, &cv, [&]() {
         movingPlatform.update(elapsed.asSeconds());
@@ -63,6 +64,15 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            keysPressed.Left = true;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            keysPressed.Right = true;
+        }
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))) {
+            keysPressed.Up = true;
         }
 
         elapsed = clock.restart();
@@ -81,6 +91,10 @@ int main() {
         window.draw(player);
 
         window.display();
+
+        keysPressed.Left = false;
+        keysPressed.Right = false;
+        keysPressed.Up = false;
     }
 
     return 0; // Return on end

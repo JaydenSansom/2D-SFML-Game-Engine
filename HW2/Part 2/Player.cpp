@@ -1,5 +1,7 @@
 #include "Player.hpp"
 
+struct KeysPressed keysPressed;
+
 /**
  * @brief Construct a new Player object.
  * 
@@ -123,19 +125,20 @@ sf::Vector2f Player::getMovement() {
  * @brief Update each frame, transforming the object based on time and keyboard input.
  * 
  * @param time time elapsed since the last frame
+ * @param keysPressed input keys currently pressed
  */
-void Player::update(float time) {
+void Player::update(float time, KeysPressed keysPressed) {
     totalMovement = sf::Vector2f(0.f, 0.f);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+    if (keysPressed.Left) {
         // Left or A key is pressed: move the player to the left
         totalMovement.x -= _speed * time;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+    if (keysPressed.Right) {
         // Right or D key is pressed: move the player to the right
         totalMovement.x += _speed * time;
     }
-    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) && !isJumping) {
+    if (keysPressed.Up && !isJumping) {
         // Space or W key is pressed: the player jumps
         isJumping = true;
         jumpVelocity = -_jumpSpeed;

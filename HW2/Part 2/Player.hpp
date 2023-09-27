@@ -5,6 +5,15 @@
 
 #include "Collider.hpp"
 
+/**
+ * @brief What input keys are being currently pressed
+ */
+struct KeysPressed {
+    bool Up = false;
+    bool Left = false;
+    bool Right = false;
+};
+
 // Global List containing all collionable objects
 extern std::vector<Collider*> collisionObjects;
 
@@ -79,8 +88,9 @@ class Player : public sf::Sprite, public Collider {
          * @brief Update each frame, transforming the object based on time and keyboard input.
          * 
          * @param time time elapsed since the last frame
+         * @param keysPressed input keys currently pressed
          */
-        void update(float time);
+        void update(float time, KeysPressed keysPressed);
 
         /**
          * @brief An override of the Collision function that adds logic of whether the player is on a platform.
