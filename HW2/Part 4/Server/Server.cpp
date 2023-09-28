@@ -69,7 +69,6 @@ void Server::replierFunction() {
         zmq::message_t message;
         replier.recv(message, zmq::recv_flags::none);
         std::string clientMessage = std::string(static_cast<char*>(message.data()), message.size());
-        std::cout << clientMessage << '\n';
 
         // ClientID,x,y
         std::vector<std::string> parsedClientMessage = parseClientMessage(clientMessage);

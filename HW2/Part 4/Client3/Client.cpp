@@ -54,7 +54,6 @@ Client::Client(PlayerClient* thisClient, std::vector<PlayerClient>* playerClient
 void Client::requesterFunction(PlayerClient* playerClient) {
     // Generate message with Client info
     std::string message = createClientMessage(playerClient);
-    std::cout << "sent: " << message << '\n';
 
     requester.send(zmq::buffer(message), zmq::send_flags::none);
 
@@ -79,7 +78,6 @@ void Client::subscriberFunction(std::vector<Object*>* objects) {
 
         for(std::string line : lines) {
             std::vector<std::string> data = parseServerMessage(line, ',');
-            std::cout << "Recieved line " << line << '\n';
 
             if(data[0] == "Object") {
                 std::string objID = data[1];
