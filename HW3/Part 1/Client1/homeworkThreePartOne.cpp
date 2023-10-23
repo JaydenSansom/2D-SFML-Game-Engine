@@ -9,6 +9,7 @@
 #include "Player.hpp"
 #include "Thread.hpp"
 #include "Timeline.hpp"
+#include "HiddenObjects.hpp"
 #include "Client.hpp"
 
 // Global window size
@@ -20,10 +21,23 @@ Timeline gameTime = Timeline(1);
 std::vector<Object*> objects;
 std::vector<sf::Drawable*> drawObjects;
 std::vector<PlayerClient> playerClients;
+std::vector<SpawnPoint*> spawnPoints;
+
+/**
+ * @brief Get the Random Spawn Point object from the spawnPoints vector
+ * 
+ * @return sf::Vector2f spawn point location
+ */
+sf::Vector2f getRandomSpawnPoint() {
+    srand(time(NULL));
+    int randomIndex = rand() % spawnPoints.size();
+    std::cout << randomIndex << '\n';
+    return spawnPoints.at(randomIndex)->getSpawnPointLocation();
+}
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 2 Part 4
+ * HW 3 Part 1
  * 
  * @return int exit code
  */
@@ -37,7 +51,7 @@ int main() {
     KeysPressed keysPressed;
 
     // Create window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 2 Part 2");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 3 Part 1");
     // Get running desktop and set window to be positioned in the middle of the screen
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.setPosition(sf::Vector2i(desktop.width / 2 - window.getSize().x / 2, 
@@ -57,12 +71,27 @@ int main() {
     Object mpObj = {"movingPlatform1", movingPlatform};
     objects.push_back(&mpObj);
     drawObjects.push_back(movingPlatform);
+    // Create spawn point
+    SpawnPoint* spawnPoint = new SpawnPoint(250.f, 430.f);
+    Object spObj = {"spawnPoint1", spawnPoint};
+    objects.push_back(&spObj);
+    spawnPoints.push_back(spawnPoint);
+    // Create another spawn point
+    SpawnPoint* spawnPoint2 = new SpawnPoint(150.f, 430.f);
+    Object spObj2 = {"spawnPoint2", spawnPoint2};
+    objects.push_back(&spObj2);
+    spawnPoints.push_back(spawnPoint2);
+    // Create death zone
+    DeathZone* deathZone = new DeathZone();
+    Object dzObj = {"deathZone", deathZone};
+    objects.push_back(&dzObj);
     // Create Player
-    Player* player = new Player(WINDOW_WIDTH, WINDOW_HEIGHT, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
+    sf::Vector2f spawnInit = getRandomSpawnPoint();
+    Player* player = new Player(WINDOW_WIDTH, WINDOW_HEIGHT, "wolfie.png", spawnInit.x, spawnInit.y, 100.f, 50.f, 300.f, 0.3f, 0.3f);
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
-    PlayerClient playerClient = {"Three", player};
+    PlayerClient playerClient = {"One", player};
     Client client(&playerClient, &playerClients);
 
     client.requesterFunction(&playerClient);

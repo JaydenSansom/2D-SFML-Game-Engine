@@ -10,6 +10,7 @@
 #include "Thread.hpp"
 #include "Timeline.hpp"
 #include "Server.hpp"
+#include "HiddenObjects.hpp"
 
 // Global window size
 int WINDOW_WIDTH = 800;
@@ -21,7 +22,7 @@ std::vector<Object*> objects;
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 2 Part 4
+ * HW 3 Part 1
  * 
  * @return int exit code
  */
@@ -47,6 +48,18 @@ int main() {
     movingPlatform->setCollisionEnabled(true);
     Object mpObj = {"movingPlatform1", movingPlatform};
     objects.push_back(&mpObj);
+    // Create spawn point
+    SpawnPoint* spawnPoint = new SpawnPoint(250.f, 430.f);
+    Object spObj = {"spawnPoint1", spawnPoint};
+    objects.push_back(&spObj);
+    // Create spawn point
+    SpawnPoint* spawnPoint2 = new SpawnPoint(150.f, 430.f);
+    Object spObj2 = {"spawnPoint2", spawnPoint2};
+    objects.push_back(&spObj2);
+    // Create death zone
+    DeathZone* deathZone = new DeathZone();
+    Object dzObj = {"deathZone", deathZone};
+    objects.push_back(&dzObj);
 
     // Set up time variables
     float previousTime = gameTime.getTime();

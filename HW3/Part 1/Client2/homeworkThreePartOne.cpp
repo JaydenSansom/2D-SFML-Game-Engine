@@ -23,7 +23,7 @@ std::vector<PlayerClient> playerClients;
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 2 Part 4
+ * HW 3 Part 1
  * 
  * @return int exit code
  */
@@ -37,7 +37,7 @@ int main() {
     KeysPressed keysPressed;
 
     // Create window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 2 Part 2");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 3 Part 1");
     // Get running desktop and set window to be positioned in the middle of the screen
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.setPosition(sf::Vector2i(desktop.width / 2 - window.getSize().x / 2, 
@@ -62,7 +62,7 @@ int main() {
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
-    PlayerClient playerClient = {"One", player};
+    PlayerClient playerClient = {"Two", player};
     Client client(&playerClient, &playerClients);
 
     client.requesterFunction(&playerClient);
