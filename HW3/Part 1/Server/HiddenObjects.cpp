@@ -150,3 +150,72 @@ sf::Vector2f DeathZone::getPosition() {
 sf::Vector2f DeathZone::getMovement() {
     return sf::Vector2f(0.f, 0.f);
 }
+
+/**
+ * @brief Construct a Side Scroll Area object with no given parameters.
+ */
+SideScrollArea::SideScrollArea() {
+    setPosition(0.f, 0.f);
+    setSize(sf::Vector2f(50.f, 50.f));
+    setFillColor(sf::Color(0, 0, 255));
+}
+
+/**
+ * @brief Construct a new Side Scroll Area object
+ * 
+ * @param x x position
+ * @param y y position
+ * @param width width of the zone
+ * @param height height of the zone
+ */
+SideScrollArea::SideScrollArea(float x, float y, float width, float height) {
+    setPosition(x, y);
+    setSize(sf::Vector2f(width, height));
+    setFillColor(sf::Color(0, 0, 255));
+}
+
+/**
+ * @brief Get the Global Bounds object
+ * 
+ * @return sf::FloatRect global bounds of the object.
+ */
+sf::FloatRect SideScrollArea::getGlobalBounds() const {
+    return sf::RectangleShape::getGlobalBounds();
+}
+
+/**
+ * @brief Override of the move function.
+ * 
+ * @param xOffset amount to move in the x direction.
+ * @param yOffset amount to move in the y direction.
+ */
+void SideScrollArea::move(float xOffset, float yOffset) {
+    setPosition(getPosition().x + xOffset, getPosition().y + yOffset);
+}
+
+/**
+ * @brief Override of the move function.
+ * 
+ * @param offset amount to move given a float 2D vector.
+ */
+void SideScrollArea::move(sf::Vector2f offset) {
+    setPosition(getPosition().x + offset.x, getPosition().y + offset.y);
+}
+
+/**
+ * @brief Override of the getPosition function.
+ * 
+ * @return sf::Vector2f position of the object
+ */
+sf::Vector2f SideScrollArea::getPosition() {
+    return sf::RectangleShape::getPosition();
+}
+
+/**
+ * @brief Get the Movement of an object
+ * 
+ * @return sf::Vector2f total movement of the object in that frame
+ */
+sf::Vector2f SideScrollArea::getMovement() {
+    return sf::Vector2f(0.f, 0.f);
+}

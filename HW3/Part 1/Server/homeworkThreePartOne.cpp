@@ -38,26 +38,42 @@ int main() {
     });
     std::thread runReplier(run_wrapper, &reciverThread);
 
-    // Create floor
-    Platform* floor = new Platform(0.f, 550.f, 800.f, 50.f);
+// Create floor
+    Platform* floor = new Platform(0.f, 550.f, 700.f, 50.f, sf::Color(178, 172, 136));
     floor->setCollisionEnabled(true);
     Object floorObj = {"floor", floor};
     objects.push_back(&floorObj);
+
     // Create moving platform
-    MovingPlatform* movingPlatform = new MovingPlatform(30.f, 400.f, 160.f, 600.f, 450.f, 180.f, 50.f, 1.f);
-    movingPlatform->setCollisionEnabled(true);
-    Object mpObj = {"movingPlatform1", movingPlatform};
-    objects.push_back(&mpObj);
+    MovingPlatform* movingPlatform1 = new MovingPlatform(30.f, 250.f, 200.f, 400.f, 400.f, 180.f, 50.f, 1.f, sf::Color(255, 84, 155));
+    movingPlatform1->setCollisionEnabled(true);
+    Object mpObj1 = {"movingPlatform1", movingPlatform1};
+    objects.push_back(&mpObj1);
+
+    // Create moving platform
+    MovingPlatform* movingPlatform2 = new MovingPlatform(30.f, 0.f, 200.f, -350.f, 250.f, 180.f, 50.f, 3.f, sf::Color(0, 133, 204));
+    movingPlatform2->setCollisionEnabled(true);
+    Object mpObj2 = {"movingPlatform2", movingPlatform2};
+    objects.push_back(&mpObj2);
+
+    // Create platform one
+    Platform* platform1 = new Platform(-650.f, 250.f, 200.f, 50.f, sf::Color(255, 219, 61));
+    platform1->setCollisionEnabled(true);
+    Object platform1Obj = {"platform1", platform1};
+    objects.push_back(&platform1Obj);
+
     // Create spawn point
     SpawnPoint* spawnPoint = new SpawnPoint(250.f, 430.f);
     Object spObj = {"spawnPoint1", spawnPoint};
     objects.push_back(&spObj);
-    // Create spawn point
+
+    // Create another spawn point
     SpawnPoint* spawnPoint2 = new SpawnPoint(150.f, 430.f);
     Object spObj2 = {"spawnPoint2", spawnPoint2};
     objects.push_back(&spObj2);
+
     // Create death zone
-    DeathZone* deathZone = new DeathZone();
+    DeathZone* deathZone = new DeathZone(-10000.f, 595.f, 20000.f, 5.f);
     Object dzObj = {"deathZone", deathZone};
     objects.push_back(&dzObj);
 
@@ -75,7 +91,8 @@ int main() {
         }
 
         // Update all shared objects that can be updated
-        movingPlatform->update(elapsed);
+        movingPlatform1->update(elapsed);
+        movingPlatform2->update(elapsed);
 
         server.publishFunction(&objects);
 

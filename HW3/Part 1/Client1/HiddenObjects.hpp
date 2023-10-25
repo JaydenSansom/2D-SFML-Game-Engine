@@ -137,4 +137,64 @@ class DeathZone : public sf::RectangleShape, public Collider {
         
 };
 
+/**
+ * @brief Class for a Side Scroll Area object
+ */
+class SideScrollArea : public sf::RectangleShape, public Collider {
+    public:
+        /**
+         * @brief Construct a Side Scroll Area object with no given parameters.
+         */
+        SideScrollArea();
+
+        /**
+         * @brief Construct a new Side Scroll Area object
+         * 
+         * @param x x position
+         * @param y y position
+         * @param width width of the zone
+         * @param height height of the zone
+         */
+        SideScrollArea(float x, float y, float width, float height);
+
+        /**
+         * @brief Get the Global Bounds object
+         * 
+         * @return sf::FloatRect global bounds of the object.
+         */
+        sf::FloatRect getGlobalBounds() const override;
+
+        /**
+         * @brief Override of the move function.
+         * 
+         * @param xOffset amount to move in the x direction.
+         * @param yOffset amount to move in the y direction.
+         */
+        void move(float xOffset, float yOffset) override;
+
+        /**
+         * @brief Override of the move function.
+         * 
+         * @param offset amount to move given a float 2D vector.
+         */
+        void move(sf::Vector2f offset) override;
+
+        /**
+         * @brief Override of the getPosition function.
+         * 
+         * @return sf::Vector2f position of the object
+         */
+        sf::Vector2f getPosition() override;
+
+        /**
+         * @brief Get the Movement of an object
+         * 
+         * @return sf::Vector2f total movement of the object in that frame
+         */
+        sf::Vector2f getMovement() override;
+
+    private:
+        
+};
+
 #endif

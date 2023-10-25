@@ -164,9 +164,7 @@ void Player::update(float time, KeysPressed keysPressed) {
     jumpVelocity += _gravity * sqrt(time);
 
     move(totalMovement);
-
-    checkWindowCollision();
-
+    
     if (onPlatform) {
         isJumping = false;
         jumpVelocity = 0.f;
@@ -216,19 +214,37 @@ bool Player::checkCollision() {
 }
 
 /**
- * @brief Checks if the player is against the window edge, not allowing it to go further
+ * @brief Checks if the object collides with another object. This will not resolve the collision
+ * 
+ * @param sf::FloatRect bounds to check for collision
+ * @return bool of whether the collide object collides with the object.
  */
-void Player::checkWindowCollision() {
-    if(getPosition().x < 0) {
-        setPosition(0.f, getPosition().y);
+bool Player::checkCollision(sf::FloatRect objectToCheck) {
+    if(getCollisionEnabled()) {
+        sf::FloatRect checkBounds = getGlobalBounds();
+
+        if(checkBounds.intersects(objectToCheck)) {
+            return true;
+        }
     }
-    if(getPosition().y < 0) {
-        setPosition(getPosition().x, 0.f);
+    return false;
+}
+
+/**
+ * @brief Checks if the object collides with a list of objects. This will not resolve the collision
+ * 
+ * @param std::vector<Collider*> bounds to check for collision
+ * @return bool of whether the collide object collides with the object.
+ */
+bool Player::checkCollision(std::vector<sf::FloatRect> objectsToCheck) {
+    if(getCollisionEnabled()) {
+        sf::FloatRect checkBounds = getGlobalBounds();
+
+        for(sf::FloatRect bounds : objectsToCheck) {
+            if(checkBounds.intersects(bounds)) {
+                return true;
+            }
+        }
     }
-    if(getPosition().x + getGlobalBounds().width > _windowWidth) {
-        setPosition(_windowWidth - getGlobalBounds().width, getPosition().y);
-    }
-    if(getPosition().y + getGlobalBounds().height > _windowHeight) {
-        setPosition(getPosition().x, _windowHeight - getGlobalBounds().height);
-    }
+    return false;
 }

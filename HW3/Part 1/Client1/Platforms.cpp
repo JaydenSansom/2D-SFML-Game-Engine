@@ -43,6 +43,21 @@ Platform::Platform(float x, float y, float width, float height, const std::strin
 }
 
 /**
+ * @brief Construct a new Platform object
+ * 
+ * @param x x position
+ * @param y y position
+ * @param width width of the platform
+ * @param height height of the platform
+ * @param color color of the platform
+ */
+Platform::Platform(float x, float y, float width, float height, sf::Color color) {
+    setPosition(x, y);
+    setSize(sf::Vector2f(width, height));
+    setFillColor(color);
+}
+
+/**
  * @brief Get the Global Bounds object
  * 
  * @return sf::FloatRect global bounds of the object.
@@ -136,7 +151,7 @@ MovingPlatform::MovingPlatform(float speed, float x, float y, float destX, float
 /**
  * @brief Construct a new Moving Platform object.
  * 
- *  @param speed speed of the moving platform
+ * @param speed speed of the moving platform
  * @param x x position
  * @param y y position
  * @param destX x position to move back and forth to
@@ -163,6 +178,34 @@ MovingPlatform::MovingPlatform(float speed, float x, float y, float destX, float
     if (texture.loadFromFile(texturePath)) {
         setTexture(&texture);
     }
+}
+
+/**
+ * @brief Construct a new Moving Platform object.
+ * 
+ *  @param speed speed of the moving platform
+ * @param x x position
+ * @param y y position
+ * @param destX x position to move back and forth to
+ * @param destY y position to move back and forth to
+ * @param width width of the platform
+ * @param height height of the platform
+ * @param pauseLength length to pause when reaching the destination
+ * @param color color of the platform
+ */
+MovingPlatform::MovingPlatform(float speed, float x, float y, float destX, float destY, float width, float height, float pauseLength, sf::Color color) {
+    setPosition(x, y);
+    setSize(sf::Vector2f(width, height));
+    _speed = speed;
+    _x = x;
+    _y = y;
+    _destX = destX;
+    _destY = destY;
+    movingForward = true;
+    _pauseLength = pauseLength;
+    paused = false;
+    totalMovement = sf::Vector2f(0.f, 0.f);
+    setFillColor(color);
 }
 
 /**
@@ -246,7 +289,13 @@ void MovingPlatform::update(float time) {
 
         float xOffset = _speed * time * directionVector.x;
         float yOffset = _speed * time * directionVector.y;
-        if(currentPosition.x + xOffset >= _destX || currentPosition.y + yOffset >= _destY) {
+
+        // Calculate the normalized vector towards destination when the 
+        sf::Vector2f directionOffsetVector(_destX - currentPosition.x + xOffset, _destY - currentPosition.y + yOffset);
+        // Get direction vector length
+        float directionOffsetLength = std::sqrt(std::pow(directionOffsetVector.x, 2.f) + std::pow(directionOffsetVector.y, 2.f));
+
+        if(directionOffsetLength < 1.f) {
             totalMovement = sf::Vector2f(_destX - currentPosition.x, _destY - currentPosition.y);
             setPosition(_destX, _destY);
             paused = true;
@@ -268,7 +317,13 @@ void MovingPlatform::update(float time) {
 
         float xOffset = _speed * time * directionVector.x;
         float yOffset = _speed * time * directionVector.y;
-        if(currentPosition.x - xOffset <= _x || currentPosition.y - yOffset <= _y) {
+
+        // Calculate the normalized vector towards destination when the 
+        sf::Vector2f directionOffsetVector(_x - currentPosition.x + xOffset, _y - currentPosition.y + yOffset);
+        // Get direction vector length
+        float directionOffsetLength = std::sqrt(std::pow(directionOffsetVector.x, 2.f) + std::pow(directionOffsetVector.y, 2.f));
+
+        if(directionOffsetLength < 1.f) {
             totalMovement = sf::Vector2f(_x - currentPosition.x, _y - currentPosition.y);
             setPosition(_x, _y);
             paused = true;
