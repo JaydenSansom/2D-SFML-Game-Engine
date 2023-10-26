@@ -63,6 +63,42 @@ bool Collider::checkCollision() {
 }
 
 /**
+ * @brief Checks if the object collides with another object. This will not resolve the collision
+ * 
+ * @param sf::FloatRect bounds to check for collision
+ * @return bool of whether the collide object collides with the object.
+ */
+bool Collider::checkCollision(sf::FloatRect objectToCheck) {
+    if(collisionEnabled) {
+        sf::FloatRect checkBounds = getGlobalBounds();
+
+        if(checkBounds.intersects(objectToCheck)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief Checks if the object collides with a list of objects. This will not resolve the collision
+ * 
+ * @param std::vector<sf::FloatRect> bounds to check for collision
+ * @return bool of whether the collide object collides with the object.
+ */
+bool Collider::checkCollision(std::vector<sf::FloatRect> objectsToCheck) {
+    if(collisionEnabled) {
+        sf::FloatRect checkBounds = getGlobalBounds();
+
+        for(sf::FloatRect bounds : objectsToCheck) {
+            if(checkBounds.intersects(bounds)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
  * @brief Resolves a collision by taking an object and what it collides with and moving it back outside 
  * that object.
  * 

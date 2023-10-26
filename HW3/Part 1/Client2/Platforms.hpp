@@ -38,6 +38,17 @@ class Platform : public sf::RectangleShape, public Collider {
         Platform(float x, float y, float width, float height, const std::string& texturePath);
 
         /**
+         * @brief Construct a new Platform object
+         * 
+         * @param x x position
+         * @param y y position
+         * @param width width of the platform
+         * @param height height of the platform
+         * @param color color of the platform
+         */
+        Platform(float x, float y, float width, float height, sf::Color color);
+
+        /**
          * @brief Get the Global Bounds object
          * 
          * @return sf::FloatRect global bounds of the object.
@@ -115,6 +126,21 @@ class MovingPlatform : public sf::RectangleShape, public Collider {
          * @param texturePath path to the texture file
          */
         MovingPlatform(float speed, float x, float y, float destX, float destY, float width, float height, float pauseLength, const std::string& texturePath);
+
+        /**
+         * @brief Construct a new Moving Platform object.
+         * 
+         *  @param speed speed of the moving platform
+         * @param x x position
+         * @param y y position
+         * @param destX x position to move back and forth to
+         * @param destY y position to move back and forth to
+         * @param width width of the platform
+         * @param height height of the platform
+         * @param pauseLength length to pause when reaching the destination
+         * @param color color of the platform
+         */
+        MovingPlatform(float speed, float x, float y, float destX, float destY, float width, float height, float pauseLength, sf::Color color);
 
         /**
          * @brief Get the Global Bounds object

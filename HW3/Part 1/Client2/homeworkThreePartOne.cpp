@@ -4,11 +4,12 @@
 #include <cmath>
 #include <zmq.hpp>
 
-#include "Collider.hpp"
+#include "GameObject.hpp"
 #include "Platforms.hpp"
 #include "Player.hpp"
 #include "Thread.hpp"
 #include "Timeline.hpp"
+#include "HiddenObjects.hpp"
 #include "Client.hpp"
 
 // Global window size
@@ -17,9 +18,22 @@ int WINDOW_HEIGHT = 600;
 
 Timeline gameTime = Timeline(1);
 
-std::vector<Object*> objects;
+std::vector<GameObject*> objects;
 std::vector<sf::Drawable*> drawObjects;
 std::vector<PlayerClient> playerClients;
+std::vector<SpawnPoint*> spawnPoints;
+std::vector<sf::FloatRect> deathZoneBounds;
+
+/**
+ * @brief Get the Random Spawn Point object from the spawnPoints vector
+ * 
+ * @return sf::Vector2f spawn point location
+ */
+sf::Vector2f getRandomSpawnPoint() {
+    srand(time(NULL));
+    int randomIndex = rand() % spawnPoints.size();
+    return spawnPoints.at(randomIndex)->getSpawnPointLocation();
+}
 
 /**
  * @brief Jayden Sansom, jksanso2
@@ -45,20 +59,64 @@ int main() {
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(60);
 
+    sf::View camera = sf::View(sf::FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT));
+    window.setView(camera);
+
+    // Create Left Scroll Zone
+    SideScrollArea leftScrollArea = SideScrollArea(0.f, 0.f, 300.f, WINDOW_HEIGHT);
+
+    // Create Right Scroll Zone
+    SideScrollArea rightScrollArea = SideScrollArea(WINDOW_WIDTH - 300.f, 0.f, 300.f, WINDOW_HEIGHT);
+
     // Create floor
-    Platform* floor = new Platform(0.f, 550.f, 800.f, 50.f);
+    Platform* floor = new Platform(0.f, 550.f, 700.f, 50.f, sf::Color(178, 172, 136));
     floor->setCollisionEnabled(true);
-    Object floorObj = {"floor", floor};
+    GameObject floorObj = GameObject("floor", floor);
     objects.push_back(&floorObj);
     drawObjects.push_back(floor);
+
     // Create moving platform
-    MovingPlatform* movingPlatform = new MovingPlatform(30.f, 400.f, 160.f, 600.f, 450.f, 180.f, 50.f, 1.f);
-    movingPlatform->setCollisionEnabled(true);
-    Object mpObj = {"movingPlatform1", movingPlatform};
-    objects.push_back(&mpObj);
-    drawObjects.push_back(movingPlatform);
+    MovingPlatform* movingPlatform1 = new MovingPlatform(30.f, 250.f, 200.f, 400.f, 400.f, 180.f, 50.f, 1.f, sf::Color(255, 84, 155));
+    movingPlatform1->setCollisionEnabled(true);
+    GameObject mpObj1 = GameObject("movingPlatform1", movingPlatform1);
+    objects.push_back(&mpObj1);
+    drawObjects.push_back(movingPlatform1);
+
+    // Create moving platform
+    MovingPlatform* movingPlatform2 = new MovingPlatform(30.f, 0.f, 200.f, -350.f, 250.f, 180.f, 50.f, 3.f, sf::Color(0, 133, 204));
+    movingPlatform2->setCollisionEnabled(true);
+    GameObject mpObj2 = GameObject("movingPlatform2", movingPlatform2);
+    objects.push_back(&mpObj2);
+    drawObjects.push_back(movingPlatform2);
+
+    // Create platform one
+    Platform* platform1 = new Platform(-650.f, 250.f, 200.f, 50.f, sf::Color(255, 219, 61));
+    platform1->setCollisionEnabled(true);
+    GameObject platform1Obj = GameObject("platform1", platform1);
+    objects.push_back(&platform1Obj);
+    drawObjects.push_back(platform1);
+
+    // Create spawn point
+    SpawnPoint* spawnPoint = new SpawnPoint(250.f, 430.f);
+    GameObject spObj = GameObject("spawnPoint1", spawnPoint);
+    objects.push_back(&spObj);
+    spawnPoints.push_back(spawnPoint);
+
+    // Create another spawn point
+    SpawnPoint* spawnPoint2 = new SpawnPoint(150.f, 430.f);
+    GameObject spObj2 = GameObject("spawnPoint2", spawnPoint2);
+    objects.push_back(&spObj2);
+    spawnPoints.push_back(spawnPoint2);
+
+    // Create death zone
+    DeathZone* deathZone = new DeathZone(-10000.f, 595.f, 20000.f, 5.f);
+    GameObject dzObj = GameObject("deathZone", deathZone);
+    objects.push_back(&dzObj);
+    deathZoneBounds.push_back(deathZone->getGlobalBounds());
+
     // Create Player
-    Player* player = new Player(WINDOW_WIDTH, WINDOW_HEIGHT, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
+    sf::Vector2f spawnInit = getRandomSpawnPoint();
+    Player* player = new Player(WINDOW_WIDTH, WINDOW_HEIGHT, "wolfie.png", spawnInit.x, spawnInit.y, 100.f, 50.f, 300.f, 0.3f, 0.3f);
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
@@ -75,8 +133,6 @@ int main() {
     // Set up time variables
     float previousTime = gameTime.getTime();
     float currentTime, elapsed;
-
-    bool pauseKeyPressedOnce = false, lowerTicKeyPressedOnce = false, raiseTicKeyPressedOnce = false;
 
     // While open loop
     while(window.isOpen()) {
@@ -106,6 +162,29 @@ int main() {
         }
 
         player->update(elapsed, keysPressed);
+        // If the player collides with a death zone
+        if(player->checkCollision(deathZoneBounds)) {
+            player->setPosition(getRandomSpawnPoint());
+            camera.setCenter(window.getDefaultView().getCenter());
+            leftScrollArea.setPosition(window.getView().getViewport().left, 0.f);
+            rightScrollArea.setPosition(window.getView().getViewport().left + window.getDefaultView().getSize().x - 300.f, 0.f);
+        }
+        if(player->checkCollision(leftScrollArea.getGlobalBounds())) {
+            sf::Vector2f playerMovement = player->getMovement();
+            if(playerMovement.x < 0.f) {
+                camera.move(playerMovement.x, 0.f);
+                leftScrollArea.move(playerMovement.x, 0.f);
+                rightScrollArea.move(playerMovement.x, 0.f);
+            }
+        }
+        if(player->checkCollision(rightScrollArea.getGlobalBounds())) {
+            sf::Vector2f playerMovement = player->getMovement();
+            if(playerMovement.x > 0.f) {
+                camera.move(playerMovement.x, 0.f);
+                leftScrollArea.move(playerMovement.x, 0.f);
+                rightScrollArea.move(playerMovement.x, 0.f);
+            }
+        }
         client.requesterFunction(&playerClient);
 
         window.clear(sf::Color(255, 255, 255, 0));
@@ -118,7 +197,7 @@ int main() {
             Player* currentPlayer = playerClient.player;
             window.draw(*currentPlayer);
         }
-
+        window.setView(camera);
         window.display();
 
         previousTime = currentTime;

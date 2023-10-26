@@ -10,7 +10,7 @@
 
 #include "Player.hpp"
 #include "Timeline.hpp"
-#include "Collider.hpp"
+#include "GameObject.hpp"
 
 /**
  * @brief Client info represented as a struct including the client's name and player character object.
@@ -18,14 +18,6 @@
 struct PlayerClient {
     std::string name;
     Player* player;
-};
-
-/**
- * @brief Object info represented as a struct including the objects's name and object.
- */
-struct Object {
-    std::string name;
-    Collider* object;
 };
 
 /**
@@ -48,7 +40,7 @@ class Client {
          * 
          * @param objects objects to publish
          */
-        void subscriberFunction(std::vector<Object*>* objects);
+        void subscriberFunction(std::vector<GameObject*>* objects);
 
     private:
         zmq::context_t context; // ZMQ socket context

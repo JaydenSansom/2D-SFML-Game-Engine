@@ -4,7 +4,7 @@
 #include <cmath>
 #include <zmq.hpp>
 
-#include "Collider.hpp"
+#include "GameObject.hpp"
 #include "Platforms.hpp"
 #include "Player.hpp"
 #include "Thread.hpp"
@@ -18,7 +18,7 @@ int WINDOW_HEIGHT = 600;
 
 Timeline gameTime = Timeline(1);
 
-std::vector<Object*> objects;
+std::vector<GameObject*> objects;
 std::vector<sf::Drawable*> drawObjects;
 std::vector<PlayerClient> playerClients;
 std::vector<SpawnPoint*> spawnPoints;
@@ -71,46 +71,46 @@ int main() {
     // Create floor
     Platform* floor = new Platform(0.f, 550.f, 700.f, 50.f, sf::Color(178, 172, 136));
     floor->setCollisionEnabled(true);
-    Object floorObj = {"floor", floor};
+    GameObject floorObj = GameObject("floor", floor);
     objects.push_back(&floorObj);
     drawObjects.push_back(floor);
 
     // Create moving platform
     MovingPlatform* movingPlatform1 = new MovingPlatform(30.f, 250.f, 200.f, 400.f, 400.f, 180.f, 50.f, 1.f, sf::Color(255, 84, 155));
     movingPlatform1->setCollisionEnabled(true);
-    Object mpObj1 = {"movingPlatform1", movingPlatform1};
+    GameObject mpObj1 = GameObject("movingPlatform1", movingPlatform1);
     objects.push_back(&mpObj1);
     drawObjects.push_back(movingPlatform1);
 
     // Create moving platform
     MovingPlatform* movingPlatform2 = new MovingPlatform(30.f, 0.f, 200.f, -350.f, 250.f, 180.f, 50.f, 3.f, sf::Color(0, 133, 204));
     movingPlatform2->setCollisionEnabled(true);
-    Object mpObj2 = {"movingPlatform2", movingPlatform2};
+    GameObject mpObj2 = GameObject("movingPlatform2", movingPlatform2);
     objects.push_back(&mpObj2);
     drawObjects.push_back(movingPlatform2);
 
     // Create platform one
     Platform* platform1 = new Platform(-650.f, 250.f, 200.f, 50.f, sf::Color(255, 219, 61));
     platform1->setCollisionEnabled(true);
-    Object platform1Obj = {"platform1", platform1};
+    GameObject platform1Obj = GameObject("platform1", platform1);
     objects.push_back(&platform1Obj);
     drawObjects.push_back(platform1);
 
     // Create spawn point
     SpawnPoint* spawnPoint = new SpawnPoint(250.f, 430.f);
-    Object spObj = {"spawnPoint1", spawnPoint};
+    GameObject spObj = GameObject("spawnPoint1", spawnPoint);
     objects.push_back(&spObj);
     spawnPoints.push_back(spawnPoint);
 
     // Create another spawn point
     SpawnPoint* spawnPoint2 = new SpawnPoint(150.f, 430.f);
-    Object spObj2 = {"spawnPoint2", spawnPoint2};
+    GameObject spObj2 = GameObject("spawnPoint2", spawnPoint2);
     objects.push_back(&spObj2);
     spawnPoints.push_back(spawnPoint2);
 
     // Create death zone
     DeathZone* deathZone = new DeathZone(-10000.f, 595.f, 20000.f, 5.f);
-    Object dzObj = {"deathZone", deathZone};
+    GameObject dzObj = GameObject("deathZone", deathZone);
     objects.push_back(&dzObj);
     deathZoneBounds.push_back(deathZone->getGlobalBounds());
 
@@ -167,7 +167,7 @@ int main() {
             player->setPosition(getRandomSpawnPoint());
             camera.setCenter(window.getDefaultView().getCenter());
             leftScrollArea.setPosition(window.getView().getViewport().left, 0.f);
-            rightScrollArea.setPosition(window.getView().getViewport().left + window.getDefaultView().getSize().x - 100.f, 0.f);
+            rightScrollArea.setPosition(window.getView().getViewport().left + window.getDefaultView().getSize().x - 300.f, 0.f);
         }
         if(player->checkCollision(leftScrollArea.getGlobalBounds())) {
             sf::Vector2f playerMovement = player->getMovement();

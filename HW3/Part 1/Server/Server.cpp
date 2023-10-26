@@ -25,10 +25,10 @@ std::vector<std::string> parseClientMessage(std::string message) {
  * @param object object to convert into string
  * @return std::string string format of object
  */
-std::string createObjectMessage(Object* object) {
+std::string createObjectMessage(GameObject* object) {
     if(object) {
-        sf::Vector2f objectPos = object->object->getPosition();
-        return "Object," + object->name + "," + std::to_string(objectPos.x) + "," + std::to_string(objectPos.y) + "\n";
+        sf::Vector2f objectPos = object->getCollider()->getPosition();
+        return "Object," + object->getName() + "," + std::to_string(objectPos.x) + "," + std::to_string(objectPos.y) + "\n";
     }
     else {
         return "";
@@ -113,12 +113,12 @@ void Server::replierFunction() {
  * 
  * @param objects objects to publish
  */
-void Server::publishFunction(std::vector<Object*>* objects) {
+void Server::publishFunction(std::vector<GameObject*>* objects) {
     using namespace std::chrono_literals;
 
     std::string message; // message to publish
 
-    for(Object* object : *objects) {
+    for(GameObject* object : *objects) {
         message += createObjectMessage(object);
     }
     for(Client client : clients) {

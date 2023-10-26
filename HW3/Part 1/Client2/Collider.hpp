@@ -35,6 +35,22 @@ class Collider {
         bool checkCollision();
 
         /**
+         * @brief Checks if the object collides with another object. This will not resolve the collision
+         * 
+         * @param sf::FloatRect bounds to check for collision
+         * @return bool of whether the collide object collides with the object.
+         */
+        bool checkCollision(sf::FloatRect objectToCheck);
+
+        /**
+         * @brief Checks if the object collides with a list of objects. This will not resolve the collision
+         * 
+         * @param std::vector<Collider*> collideable objects to check for collision
+         * @return bool of whether the collide object collides with the object.
+         */
+        bool checkCollision(std::vector<sf::FloatRect> objectsToCheck);
+
+        /**
          * @brief Resolves a collision by taking an object and what it collides with and moving it back outside 
          * that object.
          * 

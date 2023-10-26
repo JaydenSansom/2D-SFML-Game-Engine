@@ -66,7 +66,7 @@ void Client::requesterFunction(PlayerClient* playerClient) {
  * 
  * @param objects objects to publish
  */
-void Client::subscriberFunction(std::vector<Object*>* objects) {
+void Client::subscriberFunction(std::vector<GameObject*>* objects) {
     // Loop-de-loop
     while(true) {
         zmq::message_t serverMessage;
@@ -85,9 +85,9 @@ void Client::subscriberFunction(std::vector<Object*>* objects) {
                 float yPos = stof(data[3]);
                 
                 for(int i = 0; i < objects->size(); i++) {
-                    if((*objects).at(i)->name == objID) {
-                        sf::Vector2f currentPosition = (*objects).at(i)->object->getPosition();
-                        (*objects).at(i)->object->move(xPos - currentPosition.x, yPos - currentPosition.y);
+                    if((*objects).at(i)->getName() == objID) {
+                        sf::Vector2f currentPosition = (*objects).at(i)->getCollider()->getPosition();
+                        (*objects).at(i)->getCollider()->move(xPos - currentPosition.x, yPos - currentPosition.y);
                         break;
                     }
                 }

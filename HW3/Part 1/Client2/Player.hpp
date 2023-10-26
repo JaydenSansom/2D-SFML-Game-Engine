@@ -107,9 +107,20 @@ class Player : public sf::Sprite, public Collider {
         bool checkCollision();
 
         /**
-         * @brief Checks if the player is against the window edge, not allowing it to go further
+         * @brief Checks if the object collides with another object. This will not resolve the collision
+         * 
+         * @param sf::FloatRect bounds to check for collision
+         * @return bool of whether the collide object collides with the object.
          */
-        void checkWindowCollision();
+        bool checkCollision(sf::FloatRect objectToCheck);
+
+        /**
+         * @brief Checks if the object collides with a list of objects. This will not resolve the collision
+         * 
+         * @param std::vector<sf::FloatRect> collideable objects to check for collision
+         * @return bool of whether the collide object collides with the object.
+         */
+        bool checkCollision(std::vector<sf::FloatRect> objectsToCheck);
 
     private:
         float _speed; // Speed of the player
