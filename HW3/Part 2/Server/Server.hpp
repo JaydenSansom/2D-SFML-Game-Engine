@@ -18,6 +18,7 @@
 struct Client {
     std::string name;
     Player* player;
+    bool isActive;
 };
 
 /**

@@ -120,7 +120,7 @@ int main() {
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
-    PlayerClient playerClient = {"Two", player, true};
+    PlayerClient playerClient = {"Four", player, true};
     Client client(&playerClient, &playerClients);
 
     client.requesterFunction(&playerClient);

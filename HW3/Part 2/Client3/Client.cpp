@@ -29,7 +29,14 @@ std::vector<std::string> parseServerMessage(std::string message, char parseBy) {
  */
 std::string createClientMessage(PlayerClient* client) {
     sf::Vector2f playerPosition = client->player->getPosition();
-    return client->name + "," + std::to_string(playerPosition.x) + "," + std::to_string(playerPosition.y);
+    std::string isActiveString;
+    if(client->isActive) {
+        isActiveString = "true";
+    }
+    else {
+        isActiveString = "false";
+    }
+    return client->name + "," + isActiveString + "," + std::to_string(playerPosition.x) + "," + std::to_string(playerPosition.y);
 }
 
 /**
@@ -52,6 +59,7 @@ Client::Client(PlayerClient* thisClient, std::vector<PlayerClient>* playerClient
  * @brief Function to be run by the requester socket
  */
 void Client::requesterFunction(PlayerClient* playerClient) {
+
     // Generate message with Client info
     std::string message = createClientMessage(playerClient);
 
@@ -96,14 +104,28 @@ void Client::subscriberFunction(std::vector<GameObject*>* objects) {
                 bool playerClientExists = false;
 
                 std::string clientID = data[1];
-                float xPos = stof(data[2]);
-                float yPos = stof(data[3]);
+                bool isActiveClient;
+                if(data[2] == "true") {
+                    isActiveClient = true;
+                }
+                else {
+                    isActiveClient = false;
+                }
+                float xPos = stof(data[3]);
+                float yPos = stof(data[4]);
                 sf::Vector2f position = sf::Vector2f(xPos, yPos);
                 
                 if(clientID != CLIENT_ID) {
                     for(int i = 0; i < this->clients->size(); i++) {
                         if(this->clients->at(i).name == clientID) {
-                            this->clients->at(i).player->setPosition(position);
+                            this->clients->at(i).isActive = isActiveClient;
+                            if(!isActiveClient) {
+                                this->clients->at(i).player->setCollisionEnabled(false);
+                                this->clients->erase(this->clients->begin() + i);
+                            }
+                            else {
+                                this->clients->at(i).player->setPosition(position);
+                            }
                             playerClientExists = true;
                             break;
                         }
@@ -112,7 +134,7 @@ void Client::subscriberFunction(std::vector<GameObject*>* objects) {
                         Player* player = new Player(800, 600, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
                         player->setCollisionEnabled(true);
                         player->setPosition(position);
-                        PlayerClient newClient = {clientID, player};
+                        PlayerClient newClient = {clientID, player, isActiveClient};
                         clients->push_back(newClient);
                     }
                 }

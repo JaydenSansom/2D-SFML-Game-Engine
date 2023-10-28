@@ -43,7 +43,14 @@ std::string createObjectMessage(GameObject* object) {
  */
 std::string createPlayerMessage(Client* client) {
     sf::Vector2f playerPos = client->player->getPosition();
-    return "Player," + client->name + "," + std::to_string(playerPos.x) + "," + std::to_string(playerPos.y) + "\n";
+    std::string isActiveString;
+    if(client->isActive) {
+        isActiveString = "true";
+    }
+    else {
+        isActiveString = "false";
+    }
+    return "Player," + client->name + "," + isActiveString + "," + std::to_string(playerPos.x) + "," + std::to_string(playerPos.y) + "\n";
 }
 
 /**
@@ -74,8 +81,15 @@ void Server::replierFunction() {
         std::vector<std::string> parsedClientMessage = parseClientMessage(clientMessage);
 
         std::string clientID = parsedClientMessage[0];
-        float xPos = stof(parsedClientMessage[1]);
-        float yPos = stof(parsedClientMessage[2]);
+        bool isActiveClient;
+        if(parsedClientMessage[1] == "true") {
+            isActiveClient = true;
+        }
+        else {
+            isActiveClient = false;
+        }
+        float xPos = stof(parsedClientMessage[2]);
+        float yPos = stof(parsedClientMessage[3]);
 
         // Check if there are any existing clients
         if(clients.empty()) {
@@ -83,28 +97,41 @@ void Server::replierFunction() {
             Player* player = new Player(800, 600, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
             player->setCollisionEnabled(true);
             player->setPosition(xPos, yPos);
-            clients.push_back(Client{clientID, player});
+            clients.push_back(Client{clientID, player, isActiveClient});
         }
         else {
             // See if client already exists
+            int i = 0;
             for(Client client: clients) {
                 if(client.name == clientID) {
-                    client.player->setPosition(xPos, yPos);
+                    if(isActiveClient) {
+                        client.player->setPosition(xPos, yPos);
+                    }
+                    else {
+                        client.player->setCollisionEnabled(false);
+                        clients.erase(clients.begin() + i);
+                        this->replier.send(zmq::buffer("Client Disconnected"), zmq::send_flags::none);
+                        goto ClientDisconnect;
+                    }
                     newClient = false;
+                    break;
                 }
+                i++;
             }
             if(newClient) {
                 // Create Player
                 Player* player = new Player(800, 600, "wolfie.png", 250.f, 430.f, 100.f, 50.f, 300.f, 0.3f, 0.3f);
                 player->setCollisionEnabled(true);
                 player->setPosition(xPos, yPos);
-                clients.push_back(Client{clientID, player});
+                clients.push_back(Client{clientID, player, isActiveClient});
             }
         }
 
         newClient = true;
 
         this->replier.send(zmq::buffer("Reply Success!"), zmq::send_flags::none);
+
+        ClientDisconnect:;
     }
 }
 
@@ -121,8 +148,13 @@ void Server::publishFunction(std::vector<GameObject*>* objects) {
     for(GameObject* object : *objects) {
         message += createObjectMessage(object);
     }
+    int i = 0;
     for(Client client : clients) {
         message += createPlayerMessage(&client);
+        if(!client.isActive) {
+            clients.erase(clients.begin() + i);
+        }
+        i++;
     }
     // Send the reply to the client
     this->publisher.send(zmq::buffer(message), zmq::send_flags::none);

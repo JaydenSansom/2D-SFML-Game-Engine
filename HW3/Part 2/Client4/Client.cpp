@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-std::string CLIENT_ID = "One";
+std::string CLIENT_ID = "Four";
 
 /**
  * @brief Will take a server message in the format Object/Character,PositionX,PositionY

@@ -120,7 +120,7 @@ int main() {
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
-    PlayerClient playerClient = {"Three", player};
+    PlayerClient playerClient = {"Three", player, true};
     Client client(&playerClient, &playerClients);
 
     client.requesterFunction(&playerClient);
@@ -138,8 +138,11 @@ int main() {
     while(window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
+                playerClient.isActive = false;
+                client.requesterFunction(&playerClient);
+            }
         }
         if(window.hasFocus()) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
@@ -194,8 +197,10 @@ int main() {
             window.draw(*object);
         }
         for(PlayerClient playerClient : playerClients) {
-            Player* currentPlayer = playerClient.player;
-            window.draw(*currentPlayer);
+            if(playerClient.isActive) {
+                Player* currentPlayer = playerClient.player;
+                window.draw(*currentPlayer);
+            }
         }
         window.setView(camera);
         window.display();
