@@ -38,6 +38,7 @@ For Part 2:
                         -Press D or Right to move Right
                         -Press Space, W, or Up to jump
 
-                - When closing the Client window, the client's player representation will no longer appear on other clients
+                - When closing the Client window via the 'X' button on the upper-right hand corner of the game window, 
+                  the client's player representation will no longer appear on other clients.
 
         *Make sure to begin the server before running the clients
