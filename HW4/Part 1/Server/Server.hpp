@@ -8,9 +8,9 @@
 #include <vector>
 #include <zmq.hpp>
 
-#include "Player.hpp"
+#include "GameObjects/Player.hpp"
+#include "GameObjects/GameObject.hpp"
 #include "Timeline.hpp"
-#include "GameObject.hpp"
 
 /**
  * @brief Client info represented as a struct including the client's name and player character object.

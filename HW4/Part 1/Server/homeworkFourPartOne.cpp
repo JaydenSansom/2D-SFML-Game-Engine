@@ -4,13 +4,13 @@
 #include <cmath>
 #include <zmq.hpp>
 
-#include "GameObject.hpp"
-#include "Platforms.hpp"
-#include "Player.hpp"
+#include "GameObjects/GameObject.hpp"
+#include "GameObjects/Platforms.hpp"
+#include "GameObjects/Player.hpp"
+#include "GameObjects/HiddenObjects.hpp"
 #include "Thread.hpp"
 #include "Timeline.hpp"
 #include "Server.hpp"
-#include "HiddenObjects.hpp"
 
 // Global window size
 int WINDOW_WIDTH = 800;
