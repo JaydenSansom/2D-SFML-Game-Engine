@@ -1,18 +1,15 @@
-#ifndef PLAYER_HPP
-#define PLAYER_HPP
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
+
+class EventManager;
 
 #include "Collider.hpp"
 
 /**
  * @brief What input keys are being currently pressed
  */
-struct KeysPressed {
-    bool Up = false;
-    bool Left = false;
-    bool Right = false;
-};
+struct KeysPressed;
 
 // Global List containing all collionable objects
 extern std::vector<Collider*> collisionObjects;
@@ -97,14 +94,14 @@ class Player : public sf::Sprite, public Collider {
          * @param time time elapsed since the last frame
          * @param keysPressed input keys currently pressed
          */
-        void update(float time, KeysPressed keysPressed);
+        void update(float time, KeysPressed keysPressed, EventManager* manager);
 
         /**
          * @brief An override of the Collision function that adds logic of whether the player is on a platform.
          * 
          * @return whether there was a collision
          */
-        bool checkCollision();
+        bool checkCollision(EventManager* manager);
 
         /**
          * @brief Checks if the object collides with another object. This will not resolve the collision
@@ -135,5 +132,3 @@ class Player : public sf::Sprite, public Collider {
         sf::Vector2f totalMovement; // Total movement of the player
         sf::Texture texture; // Texture of the platform
 };
-
-#endif

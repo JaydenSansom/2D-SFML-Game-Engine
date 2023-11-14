@@ -4,10 +4,11 @@
 #include <cmath>
 #include <zmq.hpp>
 
-#include "GameObjects/GameObject.hpp"
-#include "GameObjects/Platforms.hpp"
-#include "GameObjects/Player.hpp"
-#include "GameObjects/HiddenObjects.hpp"
+#include "GameObject.hpp"
+#include "Platforms.hpp"
+#include "Player.hpp"
+#include "HiddenObjects.hpp"
+#include "EventManager.hpp"
 #include "Thread.hpp"
 #include "Timeline.hpp"
 #include "Server.hpp"

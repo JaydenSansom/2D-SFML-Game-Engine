@@ -1,5 +1,4 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#pragma once
 
 #include <string>
 #include <chrono>
@@ -8,8 +7,8 @@
 #include <vector>
 #include <zmq.hpp>
 
-#include "GameObjects/Player.hpp"
-#include "GameObjects/GameObject.hpp"
+#include "Player.hpp"
+#include "GameObject.hpp"
 #include "Timeline.hpp"
 
 /**
@@ -50,5 +49,3 @@ class Server {
         std::vector<Client> clients; // Clients currently in the server
 
 };
-
-#endif

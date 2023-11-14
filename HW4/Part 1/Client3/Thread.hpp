@@ -1,5 +1,4 @@
-#ifndef THREAD_HPP
-#define THREAD_HPP
+#pragma once
 #include <thread>
 #include <chrono>
 #include <mutex>
@@ -49,5 +48,3 @@ class Thread {
  * Wrapper function because threads can't take pointers to member functions.
  */
 void run_wrapper(Thread *fe);
-
-#endif

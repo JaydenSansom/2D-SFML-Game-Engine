@@ -1,5 +1,4 @@
-#ifndef HIDDENOBJECTS_HPP
-#define HIDDENOBJECTS_HPP
+#pragma once
 #include <SFML/Graphics.hpp>
 
 #include "Collider.hpp"
@@ -196,5 +195,3 @@ class SideScrollArea : public sf::RectangleShape, public Collider {
     private:
         
 };
-
-#endif

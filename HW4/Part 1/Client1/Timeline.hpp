@@ -1,5 +1,4 @@
-#ifndef TIMELINE_HPP
-#define TIMELINE_HPP
+#pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -77,5 +76,3 @@ class Timeline {
             return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         }
 };
-
-#endif

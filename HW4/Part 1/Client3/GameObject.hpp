@@ -1,5 +1,4 @@
-#ifndef GAMEOBJECT_HPP
-#define GAMEOBJECT_HPP
+#pragma once
 
 #include <string>
 
@@ -33,5 +32,3 @@ class GameObject {
         std::string name; // Name of the GameObject
         Collider* object; // Collider Object of the GameObject
 };
-
-#endif

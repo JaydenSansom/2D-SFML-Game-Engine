@@ -1,6 +1,7 @@
 #include "Player.hpp"
+#include "EventManager.hpp"
 
-struct KeysPressed keysPressed;
+struct KeysPressed;
 
 /**
  * @brief Construct a new Player object.
@@ -136,7 +137,7 @@ sf::Vector2f Player::getMovement() {
  * @param time time elapsed since the last frame
  * @param keysPressed input keys currently pressed
  */
-void Player::update(float time, KeysPressed keysPressed) {
+void Player::update(float time, KeysPressed keysPressed, EventManager* manager) {
     totalMovement = sf::Vector2f(0.f, 0.f);
 
     if (keysPressed.Left) {
@@ -153,7 +154,7 @@ void Player::update(float time, KeysPressed keysPressed) {
         jumpVelocity = -_jumpSpeed;
     }
 
-    bool isColliding = checkCollision();
+    bool isColliding = checkCollision(manager);
 
     if(onPlatform && !isJumping) {
         move(collidingPlatform->getMovement());
@@ -164,7 +165,7 @@ void Player::update(float time, KeysPressed keysPressed) {
     jumpVelocity += _gravity * sqrt(time);
 
     move(totalMovement);
-    
+
     if (onPlatform) {
         isJumping = false;
         jumpVelocity = 0.f;
@@ -177,7 +178,7 @@ void Player::update(float time, KeysPressed keysPressed) {
  * 
  * @return whether there was a collision
  */
-bool Player::checkCollision() {
+bool Player::checkCollision(EventManager* manager) {
     if(getCollisionEnabled()) {
         sf::FloatRect checkBounds = getGlobalBounds();
 
@@ -199,7 +200,7 @@ bool Player::checkCollision() {
                     onPlatform = true;
                 }
                 collidingPlatform = collideable;
-                resolveCollision(*this, *collideable);
+                manager->registerEvent(new EventCollisionHandler(manager, new EventCollision(this, new GameObject("", collideable))));
                 return true;
             }
         }

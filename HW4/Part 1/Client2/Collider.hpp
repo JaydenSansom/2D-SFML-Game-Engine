@@ -1,5 +1,4 @@
-#ifndef COLLIDER_HPP
-#define COLLIDER_HPP
+#pragma once
 #include <SFML/Graphics.hpp>
 
 /**
@@ -98,5 +97,3 @@ class Collider {
     private:
         bool collisionEnabled; // Whether the object has collision enabled
 };
-
-#endif

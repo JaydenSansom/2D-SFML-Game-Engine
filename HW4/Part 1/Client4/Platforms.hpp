@@ -1,5 +1,4 @@
-#ifndef PLATFORMS_HPP
-#define PLATFORMS_HPP
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
@@ -198,5 +197,3 @@ class MovingPlatform : public sf::RectangleShape, public Collider {
         sf::Vector2f totalMovement; // Movement of the platform in this frame;
         sf::Texture texture; // Texture of the platform
 };
-
-#endif

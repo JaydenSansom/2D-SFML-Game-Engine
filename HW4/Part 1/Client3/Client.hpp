@@ -1,5 +1,4 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#pragma once
 
 #include <string>
 #include <chrono>
@@ -50,5 +49,3 @@ class Client {
         std::vector<PlayerClient>* clients; // Clients currently in the server
         PlayerClient* thisClient; // Reference to current client
 };
-
-#endif

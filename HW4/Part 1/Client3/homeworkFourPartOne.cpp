@@ -7,9 +7,10 @@
 #include "GameObject.hpp"
 #include "Platforms.hpp"
 #include "Player.hpp"
+#include "HiddenObjects.hpp"
+#include "EventManager.hpp"
 #include "Thread.hpp"
 #include "Timeline.hpp"
-#include "HiddenObjects.hpp"
 #include "Client.hpp"
 
 // Global window size
@@ -43,12 +44,14 @@ sf::Vector2f getRandomSpawnPoint() {
  */
 int main() {
 
-        // Mutex to handle locking, condition variable to handle notifications between threads
+    // Mutex to handle locking, condition variable to handle notifications between threads
     std::mutex m;
     std::condition_variable cv;
 
     // Keys pressed to be passed to the thread update
     KeysPressed keysPressed;
+
+    EventManager eventManager;
 
     // Create window
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 4 Part 1");
@@ -144,6 +147,15 @@ int main() {
                 client.requesterFunction(&playerClient);
             }
         }
+
+        if(gameTime.isPaused()) {
+            elapsed = 0.f; // It just works "¯\_(ツ)_/¯ "
+        }
+        else {
+            currentTime = gameTime.getTime();
+            elapsed = (currentTime - previousTime) / 1000.f;
+        }
+
         if(window.hasFocus()) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
                 keysPressed.Left = true;
@@ -156,21 +168,13 @@ int main() {
             }
         }
 
-        if(gameTime.isPaused()) {
-            elapsed = 0.f; // It just works "¯\_(ツ)_/¯ "
-        }
-        else {
-            currentTime = gameTime.getTime();
-            elapsed = (currentTime - previousTime) / 1000.f;
-        }
+        eventManager.registerEvent(new EventInputHandler(&eventManager, new EventInput(player, &keysPressed, elapsed)));
 
-        player->update(elapsed, keysPressed);
+        eventManager.raise();
+
         // If the player collides with a death zone
         if(player->checkCollision(deathZoneBounds)) {
-            player->setPosition(getRandomSpawnPoint());
-            camera.setCenter(window.getDefaultView().getCenter());
-            leftScrollArea.setPosition(window.getView().getViewport().left, 0.f);
-            rightScrollArea.setPosition(window.getView().getViewport().left + window.getDefaultView().getSize().x - 300.f, 0.f);
+            eventManager.registerEvent(new EventDeathHandler(&eventManager, new EventDeath(player, &spawnPoints, &window, &camera, &leftScrollArea, &rightScrollArea)));
         }
         if(player->checkCollision(leftScrollArea.getGlobalBounds())) {
             sf::Vector2f playerMovement = player->getMovement();
@@ -188,9 +192,14 @@ int main() {
                 rightScrollArea.move(playerMovement.x, 0.f);
             }
         }
+
+        eventManager.raise();
+
         client.requesterFunction(&playerClient);
 
         window.clear(sf::Color(255, 255, 255, 0));
+
+        eventManager.raise();
 
         // Draw scene objects
         for(sf::Drawable* object : drawObjects) {
