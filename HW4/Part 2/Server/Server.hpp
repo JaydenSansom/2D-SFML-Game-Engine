@@ -10,15 +10,7 @@
 #include "Player.hpp"
 #include "GameObject.hpp"
 #include "Timeline.hpp"
-
-/**
- * @brief Client info represented as a struct including the client's name and player character object.
- */
-struct Client {
-    std::string name;
-    Player* player;
-    bool isActive;
-};
+#include "EventManager.hpp"
 
 /**
  * @brief Server class responsible for handling server calls and clients
@@ -46,6 +38,7 @@ class Server {
         zmq::context_t context; // ZMQ socket context
         zmq::socket_t replier; // Replier socket
         zmq::socket_t publisher; // Publisher socket
-        std::vector<Client> clients; // Clients currently in the server
+        std::vector<PlayerClient> clients; // Clients currently in the server
+        std::vector<Event*> events; // Events currently in the server
 
 };

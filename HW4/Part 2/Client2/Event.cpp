@@ -21,6 +21,16 @@ Varient::Varient(double value) {
 }
 
 /**
+ * @brief Construct a new Varient object with a string value
+ * 
+ * @param value string to set as the value of the varient
+ */
+Varient::Varient(std::string value) {
+    this->type = VarientType::STRING;
+    this->stringValue = value;
+}
+
+/**
  * @brief Construct a new Varient object with a boolean value
  * 
  * @param value boolean to set as the value of the varient
@@ -101,13 +111,23 @@ Varient::Varient(SideScrollArea* value) {
 }
 
 /**
- * @brief Construct a new Varient object with a side scroll area value
+ * @brief Construct a new Varient object with a list of spawn points
  * 
- * @param value side scroll area to set as the value of the varient
+ * @param value spawn points to set as the value of the varient
  */
 Varient::Varient(std::vector<SpawnPoint*>* value) {
     this->type = VarientType::SPAWN_POINTS;
     this->spawnPointsValue = value;
+}
+
+/**
+ * @brief Construct a new Varient object with a list of clients value
+ * 
+ * @param value clients to set as the value of the varient
+ */
+Varient::Varient(std::vector<PlayerClient>* value) {
+    this->type = VarientType::CLIENTS;
+    this->clientsValue = value;
 }
 
 /**
@@ -148,6 +168,12 @@ void* Varient::getValue() {
     }
     else if(this->type == VarientType::KEYS_PRESSED) {
         return this->keysPressedValue;
+    }
+    else if(this->type == VarientType::STRING) {
+        return &this->stringValue;
+    }
+    else if(this->type == VarientType::CLIENTS) {
+        return this->clientsValue;
     }
     else {
         return nullptr;
@@ -233,6 +259,17 @@ void Event::addVarient(ParamType paramType, float value) {
  * @param paramType type of parameter
  * @param value value of varient
  */
+void Event::addVarient(ParamType paramType, std::string value) {
+    this->parameters.insert({paramType, Varient(value)});
+}
+
+
+/**
+ * @brief Add Varient to the map of parameters
+ * 
+ * @param paramType type of parameter
+ * @param value value of varient
+ */
 void Event::addVarient(ParamType paramType, Player* value) {
     this->parameters.insert({paramType, Varient(value)});
 }
@@ -274,6 +311,16 @@ void Event::addVarient(ParamType paramType, SideScrollArea* value) {
  * @param value value of varient
  */
 void Event::addVarient(ParamType paramType, std::vector<SpawnPoint*>* value) {
+    this->parameters.insert({paramType, Varient(value)});
+}
+
+/**
+ * @brief Add Varient to the map of parameters
+ * 
+ * @param paramType type of parameter
+ * @param value value of varient
+ */
+void Event::addVarient(ParamType paramType, std::vector<PlayerClient>* value) {
     this->parameters.insert({paramType, Varient(value)});
 }
 

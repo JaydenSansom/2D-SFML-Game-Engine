@@ -38,7 +38,7 @@ sf::Vector2f getRandomSpawnPoint() {
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 4 Part 1
+ * HW 4 Part 2
  * 
  * @return int exit code
  */
@@ -54,7 +54,7 @@ int main() {
     EventManager eventManager;
 
     // Create window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 4 Part 1");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CSC 481 Game Engine Foundations HW 4 Part 2");
     // Get running desktop and set window to be positioned in the middle of the screen
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.setPosition(sf::Vector2i(desktop.width / 2 - window.getSize().x / 2, 
@@ -123,13 +123,13 @@ int main() {
     player->setCollisionEnabled(true);
     drawObjects.push_back(player);
 
-    PlayerClient playerClient = {"Three", player, true};
+    PlayerClient playerClient = {"Four", player, true};
     Client client(&playerClient, &playerClients);
 
     client.requesterFunction(&playerClient);
 
     Thread subscriberThread = Thread(0, nullptr, &m, &cv, [&]() {
-        client.subscriberFunction(&objects);
+        client.subscriberFunction(&objects, &eventManager);
     });
     std::thread runReplier(run_wrapper, &subscriberThread);
 

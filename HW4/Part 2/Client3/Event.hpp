@@ -9,6 +9,15 @@ class Player;
 #include "GameObject.hpp"
 
 /**
+ * @brief Client info represented as a struct including the client's name and player character object.
+ */
+struct PlayerClient {
+    std::string name;
+    Player* player;
+    bool isActive;
+};
+
+/**
  * @brief What input keys are being currently pressed
  */
 struct KeysPressed {
@@ -21,21 +30,21 @@ struct KeysPressed {
  * @brief Event types possible
  */
 enum class EventType {
-    EVENT_COLLISION, EVENT_DEATH, EVENT_SPAWN, EVENT_INPUT
+    EVENT_COLLISION, EVENT_DEATH, EVENT_SPAWN, EVENT_INPUT, EVENT_CLIENT_DISCONNECT
 };
 
 /**
  * @brief Parameter types that will be used in events
  */
 enum class ParamType {
-    X_POS, Y_POS, CHAR_POINTER, OBJ_POINTER, USER_INPUT_KEY, WINDOW, CAMERA, LEFT_SIDE_SCROLL, RIGHT_SIDE_SCROLL, SPAWN_POINTS, ELAPSED_TIME
+    X_POS, Y_POS, CHAR_POINTER, OBJ_POINTER, USER_INPUT_KEY, WINDOW, CAMERA, LEFT_SIDE_SCROLL, RIGHT_SIDE_SCROLL, SPAWN_POINTS, ELAPSED_TIME, CLIENT_NAME, CLIENTS
 };
 
 /**
  * @brief Varient types of what the map object can be
  */
 enum class VarientType {
-    OBJ_POINTER, DOUBLE, BOOL, CHAR, PLAYER, CAMERA, WINDOW, SIDE_SCROLL_AREA, SPAWN_POINTS, FLOAT, KEYS_PRESSED
+    OBJ_POINTER, DOUBLE, BOOL, CHAR, PLAYER, CAMERA, WINDOW, SIDE_SCROLL_AREA, SPAWN_POINTS, FLOAT, KEYS_PRESSED, STRING, CLIENTS
 };
 
 /**
@@ -57,6 +66,13 @@ class Varient {
          * @param value double to set as the value of the varient
          */
         Varient(double value);
+
+        /**
+         * @brief Construct a new Varient object with a string value
+         * 
+         * @param value string to set as the value of the varient
+         */
+        Varient(std::string value);
 
         /**
          * @brief Construct a new Varient object with a boolean value
@@ -117,9 +133,16 @@ class Varient {
         /**
          * @brief Construct a new Varient object with a vector of spawn points value
          * 
-         * @param value view to set as the value of the varient
+         * @param value spawn points to set as the value of the varient
          */
         Varient(std::vector<SpawnPoint*>* value);
+
+        /**
+         * @brief Construct a new Varient object with a vector of clients value
+         * 
+         * @param value player client list to set as the value of the varient
+         */
+        Varient(std::vector<PlayerClient>* value);
 
 
         /**
@@ -133,6 +156,7 @@ class Varient {
         VarientType type;
         GameObject* gameObjValue;
         double doubleValue;
+        std::string stringValue;
         bool boolValue;
         char charValue;
         float floatValue;
@@ -142,6 +166,7 @@ class Varient {
         sf::View* cameraValue;
         SideScrollArea* sideScrollValue;
         std::vector<SpawnPoint*>* spawnPointsValue;
+        std::vector<PlayerClient>* clientsValue;
 
 };
 
@@ -208,6 +233,14 @@ class Event {
          * @param paramType type of parameter
          * @param value value of varient
          */
+        void addVarient(ParamType paramType, std::string value);
+
+        /**
+         * @brief Add Varient to the map of parameters
+         * 
+         * @param paramType type of parameter
+         * @param value value of varient
+         */
         void addVarient(ParamType paramType, float value);
 
         /**
@@ -257,6 +290,14 @@ class Event {
          * @param value value of varient
          */
         void addVarient(ParamType paramType, std::vector<SpawnPoint*>* value);
+
+        /**
+         * @brief Add Varient to the map of parameters
+         * 
+         * @param paramType type of parameter
+         * @param value value of varient
+         */
+        void addVarient(ParamType paramType, std::vector<PlayerClient>* value);
 
         /**
          * @brief Get the Varient object from the map of parameters using the parameter type

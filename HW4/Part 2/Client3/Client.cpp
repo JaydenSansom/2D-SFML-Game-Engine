@@ -74,7 +74,7 @@ void Client::requesterFunction(PlayerClient* playerClient) {
  * 
  * @param objects objects to publish
  */
-void Client::subscriberFunction(std::vector<GameObject*>* objects) {
+void Client::subscriberFunction(std::vector<GameObject*>* objects, EventManager* manager) {
     // Loop-de-loop
     while(true) {
         zmq::message_t serverMessage;
@@ -100,6 +100,12 @@ void Client::subscriberFunction(std::vector<GameObject*>* objects) {
                     }
                 }
             }
+            else if(data[0] == "Event") {
+                if(data[1] == "ClientDisconnect") {
+                    std::string clientName = data[2];
+                    manager->registerEvent(new EventClientDisconnectHandler(manager, new EventClientDisconnect(clientName, this->clients)));
+                }
+            }
             else { // data[0] == "Player"
                 bool playerClientExists = false;
 
@@ -120,8 +126,8 @@ void Client::subscriberFunction(std::vector<GameObject*>* objects) {
                         if(this->clients->at(i).name == clientID) {
                             this->clients->at(i).isActive = isActiveClient;
                             if(!isActiveClient) {
-                                this->clients->at(i).player->setCollisionEnabled(false);
-                                this->clients->erase(this->clients->begin() + i);
+                                // this->clients->at(i).player->setCollisionEnabled(false);
+                                // this->clients->erase(this->clients->begin() + i);
                             }
                             else {
                                 this->clients->at(i).player->setPosition(position);

@@ -23,7 +23,7 @@ std::vector<GameObject*> objects;
 
 /**
  * @brief Jayden Sansom, jksanso2
- * HW 4 Part 1
+ * HW 4 Part 2
  * 
  * @return int exit code
  */

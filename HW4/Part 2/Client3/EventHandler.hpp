@@ -7,6 +7,7 @@ enum class EventType;
 #include "EventDeath.hpp"
 #include "EventInput.hpp"
 #include "EventSpawn.hpp"
+#include "EventClientDisconnect.hpp"
 
 class EventHandler {
     
@@ -113,6 +114,30 @@ class EventInputHandler : public EventHandler {
 
     public:
         EventInputHandler(EventManager* manager, Event* event);
+
+        void onEvent() override;
+
+        Event* getEvent() override;
+
+        EventManager* getEventManager() override;
+
+        void setEventType(EventType e);
+
+        EventType getEventType();
+
+    private:
+        EventType eventType;
+
+        EventManager* manager;
+
+        Event* event;
+
+};
+
+class EventClientDisconnectHandler : public EventHandler {
+
+    public:
+        EventClientDisconnectHandler(EventManager* manager, Event* event);
 
         void onEvent() override;
 

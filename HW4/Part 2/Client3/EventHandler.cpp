@@ -149,3 +149,37 @@ Event* EventInputHandler::getEvent() {
 EventManager* EventInputHandler::getEventManager() {
     return this->manager;
 }
+
+EventClientDisconnectHandler::EventClientDisconnectHandler(EventManager* manager, Event* event) : EventHandler(manager, event) {
+    this->manager = manager;
+    this->event = event;
+    this->eventType = EventType::EVENT_CLIENT_DISCONNECT;
+}
+
+void EventClientDisconnectHandler::onEvent() {
+    std::string clientName = *static_cast<std::string*>(this->event->getVarient(ParamType::CLIENT_NAME).getValue());
+    std::vector<PlayerClient>* clients = static_cast<std::vector<PlayerClient>*>(this->event->getVarient(ParamType::CLIENTS).getValue());
+    for(int i = 0; i < clients->size(); i++) {
+        if(clients->at(i).name == clientName) {
+            clients->at(i).player->setCollisionEnabled(false);
+            clients->erase(clients->begin() + i);
+            break;
+        }
+    }
+}
+
+void EventClientDisconnectHandler::setEventType(EventType e) {
+    this->eventType = e;
+}
+
+EventType EventClientDisconnectHandler::getEventType() {
+    return this->eventType;
+}
+
+Event* EventClientDisconnectHandler::getEvent() {
+    return this->event;
+}
+
+EventManager* EventClientDisconnectHandler::getEventManager() {
+    return this->manager;
+}
