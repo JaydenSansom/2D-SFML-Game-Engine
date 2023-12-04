@@ -131,7 +131,8 @@ void EventInputHandler::onEvent() {
     Player* player = static_cast<Player*>(this->event->getVarient(ParamType::CHAR_POINTER).getValue());
     float elapsedTime = *static_cast<float*>(this->event->getVarient(ParamType::ELAPSED_TIME).getValue());
     KeysPressed* keys = static_cast<KeysPressed*>(this->event->getVarient(ParamType::USER_INPUT_KEY).getValue());
-    player->update(elapsedTime, *keys, this->manager);
+    bool isSprinting = *static_cast<bool*>(this->event->getVarient(ParamType::IS_SPRINTING).getValue());
+    player->update(elapsedTime, *keys, this->manager, isSprinting);
 }
 
 void EventInputHandler::setEventType(EventType e) {

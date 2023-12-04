@@ -3,6 +3,10 @@
 #include <SFML/Window.hpp>
 #include <cmath>
 #include <zmq.hpp>
+#include <v8.h>
+#include <libplatform/libplatform.h>
+#include "v8helpers.h"
+#include <cstdio>
 
 #include "GameObject.hpp"
 #include "Platforms.hpp"

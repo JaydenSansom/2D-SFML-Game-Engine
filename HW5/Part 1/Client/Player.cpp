@@ -174,6 +174,56 @@ void Player::update(float time, KeysPressed keysPressed, EventManager* manager) 
 }
 
 /**
+ * @brief Update each frame, transforming the object based on time and keyboard input.
+ * 
+ * @param time time elapsed since the last frame
+ * @param keysPressed input keys currently pressed
+ */
+void Player::update(float time, KeysPressed keysPressed, EventManager* manager, bool isSprinting) {
+    int speedMultiplier;
+    if(isSprinting) {
+        speedMultiplier = 2;
+    }
+    else {
+        speedMultiplier = 1;
+    }
+
+    totalMovement = sf::Vector2f(0.f, 0.f);
+
+    if (keysPressed.Left) {
+        // Left or A key is pressed: move the player to the left
+        totalMovement.x -= _speed * time * speedMultiplier;
+    }
+    if (keysPressed.Right) {
+        // Right or D key is pressed: move the player to the right
+        totalMovement.x += _speed * time * speedMultiplier;
+    }
+    if (keysPressed.Up && !isJumping) {
+        // Space or W key is pressed: the player jumps
+        isJumping = true;
+        jumpVelocity = -_jumpSpeed;
+    }
+
+    bool isColliding = checkCollision(manager);
+
+    if(onPlatform && !isJumping) {
+        move(collidingPlatform->getMovement());
+    }
+
+    // Fall down by gravity
+    totalMovement.y = jumpVelocity * time;
+    jumpVelocity += _gravity * sqrt(time);
+
+    move(totalMovement);
+
+    if (onPlatform) {
+        isJumping = false;
+        jumpVelocity = 0.f;
+    }
+    
+}
+
+/**
  * @brief An override of the Collision function that adds logic of whether the player is on a platform.
  * 
  * @return whether there was a collision

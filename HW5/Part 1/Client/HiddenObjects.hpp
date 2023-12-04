@@ -133,7 +133,7 @@ class DeathZone : public sf::RectangleShape, public Collider {
         sf::Vector2f getMovement() override;
 
     private:
-        
+       
 };
 
 /**

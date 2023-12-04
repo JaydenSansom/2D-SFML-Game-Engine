@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <cmath>
+#include <v8.h>
+#include <libplatform/libplatform.h>
+#include "v8helpers.h"
 #include <zmq.hpp>
 
 #include "GameObject.hpp"
@@ -24,6 +27,52 @@ std::vector<sf::Drawable*> drawObjects;
 std::vector<PlayerClient> playerClients;
 std::vector<SpawnPoint*> spawnPoints;
 std::vector<sf::FloatRect> deathZoneBounds;
+bool deathZonesAreEnabled = true;
+
+ScriptManager* scriptManager = nullptr;
+
+void ScriptedEnableDisableDeathZone(const v8::FunctionCallbackInfo<v8::Value>& args)
+{
+    std::cout << "ScriptedEnableDisableDeathZone called" << std::endl;
+	deathZonesAreEnabled = !deathZonesAreEnabled;
+}
+
+void usage()
+{
+	// Usage
+	std::cout << "\n"
+		<< "Commands:\n"
+        << "\t/d: Disable/Enable Death Zones\n"
+        << "\t/e: Handle all events\n"
+		<< "\t/k: Kill the player\n"
+        << "\t/;: Print Command List\n"
+		<< std::endl;
+
+}
+
+void handleCommand(char command) {
+    switch (command) {
+        case 'd':
+            std::cout << "d given" << std::endl;
+            scriptManager->runOne("disable_death", false);
+            break;
+        case 'e':
+            std::cout << "E given" << std::endl;
+            scriptManager->runOne("handle_events", false);
+            break;
+        case 'k':
+            std::cout << "K given" << std::endl;
+            scriptManager->runOne("kill_player", false);
+            break;
+        case ';':
+            std::cout << "; given" << std::endl;
+            usage();
+            break;
+        default:
+            std::cout << "Unknown command: " << command << std::endl;
+            break;
+    }
+}
 
 /**
  * @brief Get the Random Spawn Point object from the spawnPoints vector
@@ -44,12 +93,45 @@ sf::Vector2f getRandomSpawnPoint() {
  */
 int main() {
 
+    std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
+    v8::V8::InitializePlatform(platform.release());
+    v8::V8::InitializeICU();
+    v8::V8::Initialize();
+    v8::Isolate::CreateParams create_params;
+    create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    v8::Isolate *isolate = v8::Isolate::New(create_params);
+
+    v8::Isolate::Scope isolate_scope(isolate);
+    v8::HandleScope handle_scope(isolate);
+
+    // Best practice to isntall all global functions in the context ahead of time.
+    v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
+
+    global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
+    global->Set(isolate, "gethandle", v8::FunctionTemplate::New(isolate, ScriptManager::getHandleFromScript));
+    global->Set(v8::String::NewFromUtf8(isolate, "enabledisabledeathzone"),
+            v8::FunctionTemplate::New(isolate, ScriptedEnableDisableDeathZone));
+    global->Set(isolate, "enabledisabledeathzone", v8::FunctionTemplate::New(isolate, ScriptedEnableDisableDeathZone));
+
+    v8::Local<v8::Context> default_context =  v8::Context::New(isolate, NULL, global);
+	v8::Context::Scope default_context_scope(default_context); // enter the context
+
+    scriptManager = new ScriptManager(isolate, default_context);
+
+    // Without parameters, these calls are made to all contexts
+    scriptManager->addScript("disable_death", "scripts/disable_death.js");
+    scriptManager->addScript("handle_events", "scripts/handle_events.js");
+    scriptManager->addScript("kill_player", "scripts/kill_player.js");
+
+    usage();
+
     // Mutex to handle locking, condition variable to handle notifications between threads
     std::mutex m;
     std::condition_variable cv;
 
     // Keys pressed to be passed to the thread update
     KeysPressed keysPressed;
+    bool isSprinting = false;
 
     EventManager eventManager;
 
@@ -133,6 +215,8 @@ int main() {
     });
     std::thread runReplier(run_wrapper, &subscriberThread);
 
+    float waitBeforeNextCommand = 0.f;
+
     // Set up time variables
     float previousTime = gameTime.getTime();
     float currentTime, elapsed;
@@ -142,6 +226,9 @@ int main() {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
+                isolate->Dispose();
+                v8::V8::Dispose();
+                v8::V8::ShutdownPlatform();
                 window.close();
                 playerClient.isActive = false;
                 client.requesterFunction(&playerClient);
@@ -156,25 +243,54 @@ int main() {
             elapsed = (currentTime - previousTime) / 1000.f;
         }
 
+        if(waitBeforeNextCommand > 0.f) {
+            waitBeforeNextCommand -= elapsed;
+        }
+
         if(window.hasFocus()) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-                keysPressed.Left = true;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Slash) && waitBeforeNextCommand <= 0.f) {
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+                    waitBeforeNextCommand = 1.f;
+                    handleCommand('d');
+                }
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+                    waitBeforeNextCommand = 1.f;
+                    handleCommand('e');
+                }
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
+                    waitBeforeNextCommand = 1.f;
+                    handleCommand('k');
+                }
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::SemiColon)) {
+                    waitBeforeNextCommand = 1.f;
+                    handleCommand(';');
+                }
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-                keysPressed.Right = true;
-            }
-            if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))) {
-                keysPressed.Up = true;
+            else {
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)) {
+                    isSprinting = true;
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+                    keysPressed.Left = true;
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+                    keysPressed.Right = true;
+                }
+                if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))) {
+                    keysPressed.Up = true;
+                }
             }
         }
 
-        eventManager.registerEvent(new EventInputHandler(&eventManager, new EventInput(player, &keysPressed, elapsed)));
+        eventManager.registerEvent(new EventInputHandler(&eventManager, new EventInput(player, &keysPressed, elapsed, isSprinting)));
 
         eventManager.raise();
 
         // If the player collides with a death zone
-        if(player->checkCollision(deathZoneBounds)) {
-            eventManager.registerEvent(new EventDeathHandler(&eventManager, new EventDeath(player, &spawnPoints, &window, &camera, &leftScrollArea, &rightScrollArea)));
+        if(deathZonesAreEnabled) {
+            if(player->checkCollision(deathZoneBounds)) {
+                eventManager.registerEvent(new EventDeathHandler(&eventManager, new EventDeath(player, &spawnPoints, &window, &camera, &leftScrollArea, &rightScrollArea)));
+            }   
         }
         if(player->checkCollision(leftScrollArea.getGlobalBounds())) {
             sf::Vector2f playerMovement = player->getMovement();
@@ -219,6 +335,7 @@ int main() {
         keysPressed.Left = false;
         keysPressed.Right = false;
         keysPressed.Up = false;
+        isSprinting = false;
     }
 
     return 0; // Return on end
