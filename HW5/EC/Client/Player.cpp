@@ -148,19 +148,25 @@ void Player::update(float time, KeysPressed keysPressed, EventManager* manager) 
         // Right or D key is pressed: move the player to the right
         totalMovement.x += _speed * time;
     }
+    if(keysPressed.Up) {
+        totalMovement.y -= _speed * time;
+    }
+    if(keysPressed.Down) {
+        totalMovement.y += _speed * time;
+    }
     // if (keysPressed.Up && !isJumping) {
     //     // Space or W key is pressed: the player jumps
     //     isJumping = true;
     //     jumpVelocity = -_jumpSpeed;
     // }
 
-    // bool isColliding = checkCollision(manager);
+    bool isColliding = checkCollision(manager);
 
     // if(onPlatform && !isJumping) {
     //     move(collidingPlatform->getMovement());
     // }
 
-    // Fall down by gravity
+    // // Fall down by gravity
     // totalMovement.y = jumpVelocity * time;
     // jumpVelocity += _gravity * sqrt(time);
 

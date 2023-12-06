@@ -47,7 +47,7 @@ clean:
 
 .PHONY: init
 init:
-	sudo apt update && sudo apt -y install build-essential libsfml-dev libzmq3-dev
+	sudo apt -y install build-essential libsfml-dev libzmq3-dev
 
 .PHONY: run
 run:

@@ -137,7 +137,7 @@ void Client::subscriberFunction(std::vector<GameObject*>* objects, EventManager*
                         }
                     }
                     if(!playerClientExists) {
-                        Player* player = new Player(300, 400, "player.png", (300 / 2) - 22.f, 400 - 40.f, 100.f, 50.f, 300.f, 1.f, 1.f);
+                        Player* player = new Player(600, 400, "WolfieMaze.png", 98.f, 15.f, 100.f, 50.f, 300.f, 1.f, 1.f);
                         player->setCollisionEnabled(true);
                         player->setPosition(position);
                         PlayerClient newClient = {clientID, player, isActiveClient};

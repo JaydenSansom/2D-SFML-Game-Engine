@@ -45,7 +45,11 @@ For Part 2:
                         -Press A or Left to move Left
                         -Press D or Right to move Right
                         -Press Space to shoot
+                                - The player can only shoot once every 1.75 seconds
                         -Press /r to Restart
+
+        - If all enemies are defeated, the player wins
+        - If the player loses all 3 lives or the aliens reach them, the player loses
 
         *Make sure to begin the server before running the clients
 
@@ -55,12 +59,14 @@ For Extra Credit:
                 -Enter the correct directory using the "cd dirName" command.
                 -Run the command “make clean” in case any fragments of old executables remain or you are attempting to recreate the program.
                 -Run the command “make” and look to ensure that "main" and all *.o files were created.
-                -Finally, run the command “make run” to start executing the server/client and see the demonstration of Part 2!
+                -Finally, run the command “make run” to start executing the server/client and see the demonstration of the extra credit!
                 -Focus on a client window and use the following keys to control that client's character 
                         -Press A or Left to move Left
                         -Press D or Right to move Right
                         -Press W or Up to move Up
                         -Press S or Down to move Down
                         -Press /r to Restart
+
+        - Complete the maze and reach the end goal to win!
 
         *Make sure to begin the server before running the clients

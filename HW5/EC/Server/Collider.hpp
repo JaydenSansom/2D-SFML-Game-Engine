@@ -6,6 +6,9 @@
  */
 class Collider {
     public:
+        /**
+         * @brief Destroy the Collider object
+         */
         virtual ~Collider();
 
         /**
